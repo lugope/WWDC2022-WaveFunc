@@ -1,5 +1,6 @@
 import SwiftUI
 import PlaygroundSupport
+import AppKit
 
 struct GraphShape: Shape {
     let fn: (Double) -> Double
@@ -25,7 +26,7 @@ struct GraphShape: Shape {
         let points = self.points
         return points.enumerated().map { (offset, p) in
             let screenX = CGFloat(offset) * rect.width/CGFloat(points.count - 1)
-            let screenY = rect.midY + p.y
+            let screenY = rect.midY - p.y
             
             return CGPoint(x: screenX, y: screenY)
         }
@@ -43,14 +44,14 @@ struct GraphView: View {
     var amplitude: Double = 50
     var frequency: Double = 4
     
-    private func sinFunc(_ x: Double) -> Double {
-        amplitude * sin(frequency * x)
+    private func cosFunc(_ x: Double) -> Double {
+        amplitude * cos(frequency * x)
     }
     
     var body: some View {
         GraphShape(
-            fn: { sinFunc($0) },
-            steps: 100,
+            fn: { cosFunc($0) },
+            steps: 150,
             range: 0...(2 * .pi)
         )
         .stroke(Color.blue,
@@ -66,12 +67,33 @@ struct GraphView: View {
     }
 }
 
+struct ParamSlider: View {
+    var label: String
+    var value: Binding<Double>
+    var range: ClosedRange<Double>
+    
+    var body: some View {
+        HStack {
+            Text(label)
+            Slider(value: value, in: range)
+        }
+    }
+}
+
 struct ContentView: View {
+    @State var amplitude: Double = 50.0
+    @State var frequency: Double = 4.0
+    
     var body: some View {
         VStack {
-            GraphView()
+            GraphView(amplitude: amplitude, frequency: frequency)
                 .frame(width: 300, height: 150)
                 .background(Color(red: 0.5, green: 0.5, blue: 0.5, opacity: 0.3))
+            
+            VStack {
+                ParamSlider(label: "A", value: $amplitude, range: 0...70)
+                ParamSlider(label: "k", value: $frequency, range: 1...10)
+            }
         }
         .frame(width: 400, height: 500, alignment: .center)
     }

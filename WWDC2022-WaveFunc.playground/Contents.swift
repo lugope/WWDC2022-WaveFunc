@@ -1,6 +1,5 @@
 import SwiftUI
 import PlaygroundSupport
-import AppKit
 
 struct GraphShape: Shape {
     let fn: (Double) -> Double
@@ -22,7 +21,7 @@ struct GraphShape: Shape {
     }
     
     private func normalizedPoints(in rect: CGRect) -> [CGPoint] {
-        let testRect = rect
+        
         let points = self.points
         return points.enumerated().map { (offset, p) in
             let screenX = CGFloat(offset) * rect.width/CGFloat(points.count - 1)
@@ -68,13 +67,11 @@ struct GraphView: View {
 }
 
 struct ParamSlider: View {
-    var label: String
     var value: Binding<Double>
     var range: ClosedRange<Double>
     
     var body: some View {
-        HStack {
-            Text(label)
+        VStack {
             Slider(value: value, in: range)
         }
     }
@@ -91,9 +88,12 @@ struct ContentView: View {
                 .background(Color(red: 0.5, green: 0.5, blue: 0.5, opacity: 0.3))
             
             VStack {
-                ParamSlider(label: "A", value: $amplitude, range: 0...70)
-                ParamSlider(label: "k", value: $frequency, range: 1...10)
-            }
+                Text("Amplitude (A) = \(amplitude)")
+                ParamSlider(value: $amplitude, range: 0...70)
+                
+                Text("Frequency (k) = \(frequency)")
+                ParamSlider(value: $frequency, range: 1...10)
+            }.padding()
         }
         .frame(width: 400, height: 500, alignment: .center)
     }
